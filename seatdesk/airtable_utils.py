@@ -1,7 +1,9 @@
-import streamlit as st
 import requests
+from datetime import datetime
+import pytz
+import streamlit as st
 
-# Airtable secrets
+# Airtable 시크릿 정보
 TOKEN = st.secrets["api_key"]
 BASE_ID = st.secrets["base_id"]
 TABLE_NAME = st.secrets["table_name"]
@@ -12,7 +14,7 @@ HEADERS = {
 }
 AIRTABLE_URL = f"https://api.airtable.com/v0/{BASE_ID}/{TABLE_NAME}"
 
-# 🔍 좌석 정보 가져오기
+# 좌석 데이터 불러오기
 def fetch_seat_data():
     response = requests.get(AIRTABLE_URL, headers=HEADERS)
     response.raise_for_status()
@@ -22,32 +24,32 @@ def fetch_seat_data():
     for record in records:
         fields = record.get("fields", {})
         seat = fields.get("Seat")
-        occupant = fields.get("Occupant", "🔴 Check-out")
+        occupant = fields.get("Occupant", "Check-out")
         updated = fields.get("Updated Time", "")
+        record_id = record.get("id")
+
         if seat:
             seat_data[seat] = {
                 "occupant": occupant,
-                "updated": updated
+                "updated": updated,
+                "id": record_id
             }
     return seat_data
 
-# ✏️ 좌석 정보 업데이트
-def update_seat(seat_id, occupant):
-    query = {
-        "filterByFormula": f"{{Seat}} = '{seat_id}'"
-    }
-    get_response = requests.get(AIRTABLE_URL, headers=HEADERS, params=query)
-    get_response.raise_for_status()
-    records = get_response.json().get("records", [])
+# 좌석 상태 업데이트 (단일 PATCH, 권장)
+def update_seat(record_id, occupant):
+    kst = pytz.timezone("Asia/Seoul")
+    now_kst = datetime.now(kst).isoformat()
 
-    if records:
-        record_id = records[0]["id"]
-        data = {
-            "fields": {
-                "Seat": seat_id,
-                "Occupant": occupant
-            }
+    patch_url = f"{AIRTABLE_URL}/{record_id}"  # record_id로 PATCH
+
+    data = {
+        "fields": {
+            "Occupant": occupant,
+            "Updated Time": now_kst
         }
-        patch_url = f"{AIRTABLE_URL}/{record_id}"
-        patch_response = requests.patch(patch_url, headers=HEADERS, json=data)
-        patch_response.raise_for_status()
+    }
+
+ 
+
+

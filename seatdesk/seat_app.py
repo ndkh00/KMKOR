@@ -3,55 +3,72 @@ from airtable_utils import fetch_seat_data, update_seat
 from datetime import datetime
 import pytz
 
-# 사용자 리스트
-user_names = ["🔴 Check-out", "Key", "Yu Min", "Gi Yoon", "KK", "Chan Wook", "Ji Hee"]
+user_names = ["Check-out", "Key"]
 kst = pytz.timezone("Asia/Seoul")
+
+# 드롭다운 폰트 작게
+st.markdown("""
+    <style>
+    div[data-baseweb="select"] div {
+        font-size: 13px !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 st.title("💺 Office Seating Check-in")
 
-# 좌석 정보 불러오기
 if "seats" not in st.session_state:
     st.session_state.seats = fetch_seat_data()
 
-cols = st.columns(4)
-for idx, (seat_id, data) in enumerate(sorted(st.session_state.seats.items())):
-    occupant = data["occupant"]
-    updated_raw = data["updated"]
+floor_map = {
+    "4층": ["41", "42", "43", "44", "45", "46"],
+    "3층": ["31", "32", "33", "34", "35"]
+}
 
-    # 한국 시간으로 변환
-    try:
-        updated_dt = datetime.fromisoformat(updated_raw.replace("Z", "+00:00")).astimezone(kst)
-        updated_str = updated_dt.strftime("%Y-%m-%d %H:%M")
-    except Exception:
-        updated_str = "N/A"
+for floor_name, seat_ids in floor_map.items():
+    st.subheader(f"📍 {floor_name}")
+    cols = st.columns(4)
 
-    col = cols[idx % 4]
-    with col:
-        st.markdown(f"### {seat_id}")
+    for idx, seat_id in enumerate(seat_ids):
+        data = st.session_state.seats.get(seat_id, {
+            "occupant": "Check-out",
+            "updated": "",
+            "id": None
+        })
+        occupant = data["occupant"]
+        updated_raw = data["updated"]
+        record_id = data["id"]
 
-        # 상태 정보
-        is_vacant = occupant == "🔴 Check-out"
-        status_text = "Vacant" if is_vacant else "Occupied"
+        # 시간 포맷 변환
+        try:
+            updated_dt = datetime.fromisoformat(updated_raw.replace("Z", "+00:00")).astimezone(kst)
+            updated_str = updated_dt.strftime("%m-%d %H:%M")
+        except Exception:
+            updated_str = "N/A"
+
+        is_vacant = occupant == "Check-out"
         color = "green" if is_vacant else "red"
+        status_icon = "🟢" if is_vacant else "🔴"
 
-        st.markdown(
-            f"**Status:** <span style='color:{color}; font-weight:bold'>{status_text}</span>",
-            unsafe_allow_html=True
-        )
+        with cols[idx % 4]:
+            st.markdown(
+                f"<span style='font-weight:bold; font-size:16px'>[{seat_id}]</span> "
+                f"<span style='color:{color}; font-weight:bold; font-size:16px'>{status_icon}</span> "
+                f"<span style='color:gray; font-size:12px'>{updated_str}</span>",
+                unsafe_allow_html=True
+            )
 
-        # 시간만 표시 (라벨 제거)
-        st.caption(updated_str)
+            selected = st.selectbox(
+                label="Seat User Selector",   # label은 꼭 아무거나 입력!
+                options=user_names,
+                index=user_names.index(occupant) if occupant in user_names else 0,
+                key=f"select_{seat_id}",
+                label_visibility="collapsed"
+            )
 
-        # 사용자 선택
-        selected = st.selectbox(
-            "Select user",
-            options=user_names,
-            index=user_names.index(occupant) if occupant in user_names else 0,
-            key=f"select_{seat_id}"
-        )
+            # 상태 변경시만 업데이트 (record_id로!)
+            if selected != occupant and record_id:
+                update_seat(record_id, selected)
+                st.session_state.seats = fetch_seat_data()
+                st.rerun()
 
-        # 선택값 변경 시 업데이트
-        if selected != occupant:
-            update_seat(seat_id, selected)
-            st.session_state.seats = fetch_seat_data()
-            st.rerun()
