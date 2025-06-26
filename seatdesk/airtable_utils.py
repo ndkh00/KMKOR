@@ -24,7 +24,7 @@ def fetch_seat_data():
     for record in records:
         fields = record.get("fields", {})
         seat = fields.get("Seat")
-        occupant = fields.get("Occupant", "Check-out")
+        occupant = fields.get("SeatUser", "Check-out")   # 바뀐 컬럼명
         updated = fields.get("Updated Time", "")
         record_id = record.get("id")
 
@@ -36,20 +36,22 @@ def fetch_seat_data():
             }
     return seat_data
 
-# 좌석 상태 업데이트 (단일 PATCH, 권장)
+# 좌석 상태 업데이트 (에러시 콘솔 로그, 예외전파)
 def update_seat(record_id, occupant):
     kst = pytz.timezone("Asia/Seoul")
     now_kst = datetime.now(kst).isoformat()
-
-    patch_url = f"{AIRTABLE_URL}/{record_id}"  # record_id로 PATCH
+    patch_url = f"{AIRTABLE_URL}/{record_id}"
 
     data = {
         "fields": {
-            "Occupant": occupant,
+            "SeatUser": occupant,             # 바뀐 컬럼명
             "Updated Time": now_kst
         }
     }
-
- 
-
-
+    print(f"PATCH DATA: {data}")
+    response = requests.patch(patch_url, headers=HEADERS, json=data)
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print("PATCH error:", response.text)
+        raise e
