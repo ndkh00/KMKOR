@@ -24,7 +24,7 @@ def fetch_seat_data():
     for record in records:
         fields = record.get("fields", {})
         seat = fields.get("Seat")
-        occupant = fields.get("SeatUser", "Check-out")   # 바뀐 컬럼명
+        occupant = fields.get("SeatUser", "Check-out")
         updated = fields.get("Updated Time", "")
         record_id = record.get("id")
 
@@ -36,16 +36,13 @@ def fetch_seat_data():
             }
     return seat_data
 
-# 좌석 상태 업데이트 (에러시 콘솔 로그, 예외전파)
+# 좌석 상태 업데이트 (오직 SeatUser만 PATCH)
 def update_seat(record_id, occupant):
-    kst = pytz.timezone("Asia/Seoul")
-    now_kst = datetime.now(kst).isoformat()
     patch_url = f"{AIRTABLE_URL}/{record_id}"
 
     data = {
         "fields": {
-            "SeatUser": occupant,             # 바뀐 컬럼명
-            "Updated Time": now_kst
+            "SeatUser": occupant      # "Updated Time"은 절대 포함 X
         }
     }
     print(f"PATCH DATA: {data}")

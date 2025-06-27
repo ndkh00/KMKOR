@@ -3,10 +3,9 @@ from airtable_utils import fetch_seat_data, update_seat
 from datetime import datetime
 import pytz
 
-user_names = ["Check-out", "Key"]
+user_names = ["🔓Check-out", "Ki-Mac", "Chan Wook", "Ji Hee", "Superman", "Jong Ho"]
 kst = pytz.timezone("Asia/Seoul")
 
-# 드롭다운 폰트 작게
 st.markdown("""
     <style>
     div[data-baseweb="select"] div {
@@ -31,7 +30,7 @@ for floor_name, seat_ids in floor_map.items():
 
     for idx, seat_id in enumerate(seat_ids):
         data = st.session_state.seats.get(seat_id, {
-            "occupant": "Check-out",
+            "occupant": "🔓Check-out",
             "updated": "",
             "id": None
         })
@@ -46,7 +45,7 @@ for floor_name, seat_ids in floor_map.items():
         except Exception:
             updated_str = "N/A"
 
-        is_vacant = occupant == "Check-out"
+        is_vacant = occupant == "🔓Check-out"
         color = "green" if is_vacant else "red"
         status_icon = "🟢" if is_vacant else "🔴"
 
@@ -59,7 +58,7 @@ for floor_name, seat_ids in floor_map.items():
             )
 
             selected = st.selectbox(
-                label="Seat User Selector",   # label은 꼭 아무거나 입력!
+                label="Seat User Selector",
                 options=user_names,
                 index=user_names.index(occupant) if occupant in user_names else 0,
                 key=f"select_{seat_id}",
@@ -68,7 +67,9 @@ for floor_name, seat_ids in floor_map.items():
 
             # 상태 변경시만 업데이트 (record_id로!)
             if selected != occupant and record_id:
-                update_seat(record_id, selected)
-                st.session_state.seats = fetch_seat_data()
-                st.rerun()
-
+                try:
+                    update_seat(record_id, selected)
+                    st.session_state.seats = fetch_seat_data()
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"좌석 업데이트 중 오류 발생: {e}")
