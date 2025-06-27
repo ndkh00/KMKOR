@@ -20,8 +20,8 @@ if "seats" not in st.session_state:
     st.session_state.seats = fetch_seat_data()
 
 floor_map = {
-    "4층": ["41", "42", "43", "44", "45", "46"],
-    "3층": ["31", "32", "33", "34", "35"]
+    "4층": [f"D{str(i).zfill(2)}" for i in range(1, 13)],  # D01 ~ D12
+    "3층": [f"C{str(i).zfill(2)}" for i in range(1, 13)]   # C01 ~ C12
 }
 
 for floor_name, seat_ids in floor_map.items():
