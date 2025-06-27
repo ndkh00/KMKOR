@@ -14,7 +14,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("💺 Office Seating Check-in")
+st.title("💺 Office Check-in")
 
 if "seats" not in st.session_state:
     st.session_state.seats = fetch_seat_data()
