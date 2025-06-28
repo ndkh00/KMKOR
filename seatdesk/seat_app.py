@@ -6,7 +6,15 @@ import pytz
 user_names = ["🔓Check-out", "Ki-Mac", "Chan Wook", "Ji Hee", "Superman", "Jong Ho"]
 kst = pytz.timezone("Asia/Seoul")
 
-# ---------- PAGE HEADER ----------
+st.markdown("""
+    <style>
+    div[data-baseweb="select"] div {
+        font-size: 13px !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# ---------- HEADER + REFRESH BUTTON ----------
 col1, col2 = st.columns([6, 1])
 
 with col1:
@@ -14,6 +22,7 @@ with col1:
 
 with col2:
     if st.button("🔃 Refresh Now"):
+        # 캐시 비우고 데이터 새로 불러오기
         st.session_state.seats = fetch_seat_data()
         st.rerun()
 
@@ -28,7 +37,6 @@ floor_map = {
 
 # 행(row)로 좌석을 4개씩 잘라서 출력
 def chunk_list(lst, n):
-    """리스트를 n개씩 분할"""
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
@@ -46,7 +54,6 @@ for floor_name, seat_ids in floor_map.items():
             updated_raw = data["updated"]
             record_id = data["id"]
 
-            # 시간 포맷 변환
             try:
                 updated_dt = datetime.fromisoformat(updated_raw.replace("Z", "+00:00")).astimezone(kst)
                 updated_str = updated_dt.strftime("%m-%d %H:%M")
@@ -73,7 +80,6 @@ for floor_name, seat_ids in floor_map.items():
                     label_visibility="collapsed"
                 )
 
-                # 상태 변경 시에만 업데이트
                 if selected != occupant and record_id:
                     try:
                         update_seat(record_id, selected)

@@ -1,5 +1,7 @@
-import streamlit as st
 import requests
+from datetime import datetime
+import pytz
+import streamlit as st
 
 # Airtable 시크릿 정보
 TOKEN = st.secrets["api_key"]
@@ -34,13 +36,13 @@ def fetch_seat_data():
             }
     return seat_data
 
-# 좌석 상태 업데이트 (SeatUser만 PATCH)
+# 좌석 상태 업데이트 (오직 SeatUser만 PATCH)
 def update_seat(record_id, occupant):
     patch_url = f"{AIRTABLE_URL}/{record_id}"
 
     data = {
         "fields": {
-            "SeatUser": occupant
+            "SeatUser": occupant      # "Updated Time"은 절대 포함 X
         }
     }
     print(f"PATCH DATA: {data}")
@@ -50,18 +52,3 @@ def update_seat(record_id, occupant):
     except requests.exceptions.HTTPError as e:
         print("PATCH error:", response.text)
         raise e
-
-# ---------- MAIN APP ----------
-
-st.title("💺 Office Seating App")
-
-# Refresh 버튼
-if st.button("🔃 Refresh Now"):
-    st.cache_data.clear()
-    st.rerun()
-
-# 항상 fresh data 가져오기
-seat_data = fetch_seat_data()
-
-# 좌석 데이터 출력
-st.write(seat_data)
