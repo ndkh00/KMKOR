@@ -6,16 +6,18 @@ import pytz
 user_names = ["🔓Check-out", "Ki-Mac", "Chan Wook", "Ji Hee", "Superman", "Jong Ho"]
 kst = pytz.timezone("Asia/Seoul")
 
-st.markdown("""
-    <style>
-    div[data-baseweb="select"] div {
-        font-size: 13px !important;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# ---------- PAGE HEADER ----------
+col1, col2 = st.columns([6, 1])
 
-st.title("💺 Office Check-in")
+with col1:
+    st.title("💺 Office Check-in")
 
+with col2:
+    if st.button("🔃 Refresh Now"):
+        st.session_state.seats = fetch_seat_data()
+        st.rerun()
+
+# ---------- LOAD SEAT DATA ----------
 if "seats" not in st.session_state:
     st.session_state.seats = fetch_seat_data()
 
@@ -32,7 +34,7 @@ def chunk_list(lst, n):
 
 for floor_name, seat_ids in floor_map.items():
     st.subheader(f"📍 {floor_name}")
-    for row in chunk_list(seat_ids, 4):  # 4개씩 슬라이싱
+    for row in chunk_list(seat_ids, 4):
         cols = st.columns(4)
         for idx, seat_id in enumerate(row):
             data = st.session_state.seats.get(seat_id, {
@@ -71,7 +73,7 @@ for floor_name, seat_ids in floor_map.items():
                     label_visibility="collapsed"
                 )
 
-                # 상태 변경시만 업데이트 (record_id로!)
+                # 상태 변경 시에만 업데이트
                 if selected != occupant and record_id:
                     try:
                         update_seat(record_id, selected)
