@@ -2,6 +2,7 @@ import streamlit as st
 from airtable_utils import fetch_seat_data, update_seat
 from datetime import datetime
 import pytz
+import os
 
 user_names = ["🔓Check-out", "Ki-Mac", "Chan Wook", "Ji Hee", "Superman", "Jong Ho"]
 kst = pytz.timezone("Asia/Seoul")
@@ -19,7 +20,10 @@ col1, col2 = st.columns([6, 1])
 
 with col1:
     st.title("💺 Office Check-In")
-    st.image("static/f34.jpg", use_container_width=True)
+    current_dir = os.path.dirname(__file__)
+image_path = os.path.join(current_dir, "static", "f34.jpg")
+
+st.image(image_path, use_container_width=True)
 
 with col2:
     if st.button("🔃 Refresh Now"):
