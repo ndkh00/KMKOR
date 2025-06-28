@@ -19,7 +19,7 @@ col1, col2 = st.columns([6, 1])
 
 with col1:
     st.title("💺 Office Check-In")
-    st.image("f34.jpg", use_container_width=True)
+    st.image("static/f34.jpg", use_container_width=True)
 
 with col2:
     if st.button("🔃 Refresh Now"):
