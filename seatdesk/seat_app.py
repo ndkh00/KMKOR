@@ -37,7 +37,10 @@ if "seats" not in st.session_state:
 
 floor_map = {
     "4층": [f"4{zone}-{str(i).zfill(2)}" for zone in ["A", "B"] for i in range(1, 7)],
-    "3층": [f"3{zone}-{str(i).zfill(2)}" for zone in ["A", "B"] for i in range(1, 7)],
+    "3층": (
+        [f"3{zone}-{str(i).zfill(2)}" for zone in ["A", "B"] for i in range(1, 7)]
+        + [f"3C-{str(i).zfill(2)}" for i in range(1, 5)]
+    )
 }
 
 # 행(row)로 좌석을 4개씩 잘라서 출력
