@@ -34,7 +34,7 @@ image_path = os.path.join(current_dir, "static", "f34.jpg")
 st.image(image_path, use_container_width=True)
 
 with col2:
-    if st.button("🔃 Refresh Now"):
+    if st.button("Refresh Now🔄"):
         # 캐시 비우고 데이터 새로 불러오기
         st.session_state.seats = fetch_seat_data()
         st.rerun()
