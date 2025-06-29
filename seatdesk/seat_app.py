@@ -27,7 +27,7 @@ st.markdown("""
 col1, col2 = st.columns([6, 1])
 
 with col1:
-    st.title("💺 Office Check-In")
+    st.title("💺 Desk Check-In")
     current_dir = os.path.dirname(__file__)
 image_path = os.path.join(current_dir, "static", "f34.jpg")
 
