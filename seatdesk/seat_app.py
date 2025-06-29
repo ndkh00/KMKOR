@@ -4,7 +4,15 @@ from datetime import datetime
 import pytz
 import os
 
-user_names = ["🔓Check-out", "Ki-Mac", "Chan Wook", "Ji Hee", "Superman", "Jong Ho"]
+user_names = [
+    "🔓Check-out", "Bo Kyung Kang", "Byeong Ho Son", "Chan Wook Koo", "Chang Ki Rho", 
+    "Chang Mo Tak", "Chi Hun Jeong", "Chil Yeop Chun", "Dong Hyun Kim", "Eui Su Hwang", 
+    "Eun Jung Lee", "Eun Seok Choe", "Gi Yoon Yoo", "Hwa Jun Song", "Hyeon Seo Yoo", 
+    "Hyun Jun Kim", "In Baek Cho", "Jeong Hoon Lee", "Ji Hee Han", "Ji Hyun Kim", 
+    "Ji Ye Shin", "Jong Ho Woo", "Jong Kook Kim", "Kyung Gook Lee", "Kyung Kyu Cho",
+    "Man Sok Kim", "Min Hui Kim", "Min Kweon Kim", "Sang Jun Lim", "Sung Hoe Hur",
+    "Sung Hywan Kim", "Sung Moo Jeon", "Won Jeong Jeong", "Yong Uk Seo", "Young Hun Han"
+]
 kst = pytz.timezone("Asia/Seoul")
 
 st.markdown("""
